@@ -81,3 +81,9 @@
                {:content-type :json
                 :body (json/write-str task)
                 :accept :json}))
+
+(defn trigger-workflow [workflow version params]
+  (http/post (str (root-uri) "workflow/" (name workflow))
+             {:content-type :json
+              :query-params {:version version}
+              :body (json/write-str params)}))
