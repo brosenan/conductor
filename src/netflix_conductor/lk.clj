@@ -1,7 +1,8 @@
 (ns netflix-conductor.lk
   (:require [lambdakube.core :as lk]
             [lambdakube.util :as lku]
-            [clojure.java.io :as io])
+            [clojure.java.io :as io]
+            [netflix-conductor.core :as conduct])
   (:gen-class))
 
 
@@ -49,6 +50,22 @@
 
 (defn add-client-envs [server]
   (lk/add-env {:CONDUCTOR_API_URL (conductor-base-url server)}))
+
+(defn clj-worker-deployment [name labels deps code & {:keys [num-pods num-threads]
+                                                      :or {num-pods 1
+                                                           num-threads 2}}]
+  (let [workers (vec (for [[defworker worker] code
+                           :when (= defworker 'defworker)]
+                       `(var ~worker)))
+        code (for [[defworker & args] code]
+               (if (= defworker 'defworker)
+                 (cons 'defn args)
+                 ;; else
+                 (cons defworker args)))
+        code (concat code [`(conduct/run-workers ~workers ~num-threads)])]
+    (-> (lk/pod name labels)
+        (lku/add-clj-container name deps {} code)
+        (lk/deployment num-pods))))
 
 (defn -main []
   (-> (lk/injector)
