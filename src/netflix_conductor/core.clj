@@ -28,13 +28,14 @@
       (getTaskDefName [this]
         (str task-def-name))
       (execute [this task]
-        (let [inputs (into {} (.getInputData task))
+        (let [inputs (into {} (for [[k v] (.getInputData task)]
+                                [(keyword k) v]))
               outputs (worker-fn inputs)
               result (TaskResult.)]
           (.setStatus result TaskResult$Status/COMPLETED)
           (let [output-data (.getOutputData result)]
             (doseq [[k v] outputs]
-              (.put output-data k v)))
+              (.put output-data (name k) v)))
           result)))))
 
 (defn coordinator [workers num-threads]
@@ -48,10 +49,30 @@
   (-> (coordinator workers num-threads)
       (.init)))
 
+(declare add-unique-ids-to-tasks)
+
+(defn add-unique-ids-to-task [task prefix curr]
+  (let [task (assoc task :taskReferenceName (str prefix curr))]
+    (case (:type task)
+      :FORK_JOIN (update task :forkTasks #(map (fn [alt num]
+                                                 (add-unique-ids-to-tasks alt (str prefix curr "_" num "_") 0))
+                                               % (range (count %))))
+      task)))
+
+(defn add-unique-ids-to-tasks [tasks prefix curr]
+  (if (empty? tasks)
+    nil
+    ;; else
+    (cons (add-unique-ids-to-task (first tasks) prefix curr)
+          (add-unique-ids-to-tasks (rest tasks) prefix (inc curr)))))
+
+(defn add-unique-ids [workflow]
+  (update workflow :tasks add-unique-ids-to-tasks "task" 0))
+
 (defn define-workflow [workflow]
   (http/post (str (root-uri) "metadata/workflow")
              {:content-type :json
-              :body (json/write-str workflow)
+              :body (json/write-str (add-unique-ids workflow))
               :accept :json}))
 
 
