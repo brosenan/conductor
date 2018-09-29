@@ -1,6 +1,7 @@
 (ns conductor.core
   (:require [clojure.data.json :as json]
-            [clj-http.client :as http])
+            [clj-http.client :as http]
+            [clojure.set :as set])
   (:import (com.netflix.conductor.client.task WorkflowTaskCoordinator
                                               WorkflowTaskCoordinator$Builder)
            (com.netflix.conductor.client.worker Worker)
@@ -80,12 +81,24 @@
               :body (json/write-str (add-unique-ids workflow))
               :accept :json}))
 
+(def taskdef-keys #{:retryCount :retryLogic :timeoutSeconds :timeoutPolicy :responseTimeoutSeconds :outputKeys})
 
-(defn define-task [task]
-  (http/post (str (root-uri) "metadata/taskdefs")
+(defn task-for-var [v]
+  (let [m (meta v)
+        n (-> m :name str)
+        inputs (->> v meta :arglists first first :keys (map keyword))]
+    (->> (set/intersection taskdef-keys m)
+         (map (fn [k] [k (m k)]))
+         (into {})
+         (merge {:name n
+                 :inputKeys inputs}))))
+
+(defn define-tasks [vars]
+  (let [tasks (map task-for-var vars)]
+    (http/post (str (root-uri) "metadata/taskdefs")
                {:content-type :json
-                :body (json/write-str task)
-                :accept :json}))
+                :body (json/write-str tasks)
+                :accept :json})))
 
 (defn trigger-workflow [workflow version params]
   (http/post (str (root-uri) "workflow/" (name workflow))
