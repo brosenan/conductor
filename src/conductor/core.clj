@@ -52,7 +52,10 @@
 (declare add-unique-ids-to-tasks)
 
 (defn add-unique-ids-to-task [task prefix curr prev]
-  (let [task (assoc task :taskReferenceName (str prefix curr))]
+  (let [task (if (contains? task :taskReferenceName)
+               task
+               ;; else
+               (assoc task :taskReferenceName (str prefix curr)))]
     (case (:type task)
       :FORK_JOIN (update task :forkTasks #(map (fn [alt num]
                                                  (add-unique-ids-to-tasks alt (str prefix curr "_" num "_") 0 {}))
