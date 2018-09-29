@@ -1,8 +1,8 @@
-(ns netflix-conductor.lk
+(ns conductor.lk
   (:require [lambdakube.core :as lk]
             [lambdakube.util :as lku]
             [clojure.java.io :as io]
-            [netflix-conductor.core :as conduct])
+            [conductor.core :as conduct])
   (:gen-class))
 
 

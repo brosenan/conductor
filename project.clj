@@ -1,6 +1,6 @@
-(defproject brosenan/netflix-conductor "0.1.0-SNAPSHOT"
+(defproject brosenan/conductor "0.1.0-SNAPSHOT"
   :description "A lambda-kube recipe for installing Netflix Conductor"
-  :url "https://github.com/brosenan/netflix-conductor"
+  :url "https://github.com/brosenan/conductor"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.9.0"]
@@ -11,5 +11,5 @@
                  [org.clojure/data.json "0.2.6"]
                  [clj-http "3.9.1"]]
   :plugins [[lein-auto "0.1.3"]]
-  :main netflix-conductor.lk)
+  :main conductor.lk)
 

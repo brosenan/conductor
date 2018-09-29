@@ -1,6 +1,6 @@
-(ns netflix-conductor.core-test
+(ns conductor.core-test
   (:require [clojure.test :refer :all]
-            [netflix-conductor.core :refer :all]))
+            [conductor.core :refer :all]))
 
 (deftest a-test
   (testing "FIXME, I fail."

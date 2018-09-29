@@ -1,4 +1,4 @@
-(ns netflix-conductor.core
+(ns conductor.core
   (:require [clojure.data.json :as json]
             [clj-http.client :as http])
   (:import (com.netflix.conductor.client.task WorkflowTaskCoordinator
