@@ -51,23 +51,25 @@
 
 (declare add-unique-ids-to-tasks)
 
-(defn add-unique-ids-to-task [task prefix curr]
+(defn add-unique-ids-to-task [task prefix curr prev]
   (let [task (assoc task :taskReferenceName (str prefix curr))]
     (case (:type task)
       :FORK_JOIN (update task :forkTasks #(map (fn [alt num]
-                                                 (add-unique-ids-to-tasks alt (str prefix curr "_" num "_") 0))
+                                                 (add-unique-ids-to-tasks alt (str prefix curr "_" num "_") 0 {}))
                                                % (range (count %))))
+      :JOIN (assoc task :joinOn (for [alt (:forkTasks prev)]
+                                  (-> alt last :taskReferenceName)))
       task)))
 
-(defn add-unique-ids-to-tasks [tasks prefix curr]
+(defn add-unique-ids-to-tasks [tasks prefix curr prev]
   (if (empty? tasks)
     nil
     ;; else
-    (cons (add-unique-ids-to-task (first tasks) prefix curr)
-          (add-unique-ids-to-tasks (rest tasks) prefix (inc curr)))))
+    (let [task (add-unique-ids-to-task (first tasks) prefix curr prev)]
+      (cons task (add-unique-ids-to-tasks (rest tasks) prefix (inc curr) task)))))
 
 (defn add-unique-ids [workflow]
-  (update workflow :tasks add-unique-ids-to-tasks "task" 0))
+  (update workflow :tasks add-unique-ids-to-tasks "task" 0 {}))
 
 (defn define-workflow [workflow]
   (http/post (str (root-uri) "metadata/workflow")
