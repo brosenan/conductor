@@ -101,7 +101,13 @@
                 :accept :json})))
 
 (defn trigger-workflow [workflow version params]
-  (http/post (str (root-uri) "workflow/" (name workflow))
-             {:content-type :json
-              :query-params {:version version}
-              :body (json/write-str params)}))
+  (let [resp (http/post (str (root-uri) "workflow/" (name workflow))
+                        {:content-type :json
+                         :query-params {:version version}
+                         :body (json/write-str params)})]
+    (:body resp)))
+
+(defn workflow-status [wf-id]
+  (let [resp (http/get (str (root-uri) "workflow/" wf-id)
+                       {:accept :json})]
+    (-> resp :body json/read-str (get "status"))))
