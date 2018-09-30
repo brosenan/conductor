@@ -11,5 +11,6 @@
                  [org.clojure/data.json "0.2.6"]
                  [clj-http "3.9.1"]]
   :plugins [[lein-auto "0.1.3"]]
-  :main conductor.lk)
+  :main conductor.lk
+  :deploy-repositories [["releases" :clojars]])
 
