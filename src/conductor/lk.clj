@@ -66,7 +66,9 @@
                  (cons defworker args)))
         code (concat code `[(require 'conductor.core)
                             (conductor.core/define-tasks ~workers)
-                            (conductor.core/run-workers ~workers ~num-threads)])]
+                            (conductor.core/run-workers ~workers ~num-threads)
+                            (while true
+                              (Thread/sleep 1000))])]
     (-> (lk/pod name labels)
         (lku/add-clj-container name deps constants code)
         (lk/update-container name add-client-envs server)
