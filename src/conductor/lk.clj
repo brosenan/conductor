@@ -48,12 +48,13 @@
                        (lk/deployment 1)
                        (lk/expose-cluster-ip :conductor-ui (lk/port :conductor :web 5000 5000))))))))
 
-(defn add-client-envs [server]
-  (lk/add-env {:CONDUCTOR_API_URL (conductor-base-url server)}))
+(defn add-client-envs [cont server]
+  (-> cont
+      (lk/add-env {:CONDUCTOR_API_URL (conductor-base-url server)})))
 
-(defn clj-worker-deployment [name labels deps code & {:keys [num-pods num-threads]
-                                                      :or {num-pods 1
-                                                           num-threads 2}}]
+(defn clj-worker-deployment [server name labels deps code & {:keys [num-pods num-threads]
+                                                             :or {num-pods 1
+                                                                  num-threads 2}}]
   (let [workers (vec (for [[defworker worker] code
                            :when (= defworker 'defworker)]
                        `(var ~worker)))
@@ -65,6 +66,7 @@
         code (concat code [`(conduct/run-workers ~workers ~num-threads)])]
     (-> (lk/pod name labels)
         (lku/add-clj-container name deps {} code)
+        (lk/update-container name add-client-envs server)
         (lk/deployment num-pods))))
 
 (defn -main []
