@@ -1,4 +1,4 @@
-(defproject brosenan/conductor "0.1.0-SNAPSHOT"
+(defproject brosenan/conductor "0.1.0"
   :description "A lambda-kube recipe for installing Netflix Conductor"
   :url "https://github.com/brosenan/conductor"
   :license {:name "Eclipse Public License"
