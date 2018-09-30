@@ -1,6 +1,6 @@
 * [Introduction](#introduction)
   * [The Example](#the-example)
-  * [How This Example is Written](#how-this-example-is written)
+  * [How This Example is Written](#how-this-example-is-written)
 * [The Worker Nanoservice](#the-worker-nanoservice)
 * [The Test](#the-test)
   * [The Workflow](#the-workflow)
