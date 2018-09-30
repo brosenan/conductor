@@ -9,7 +9,8 @@
                   :exclusions [com.google.guava/guava]]
                  [org.slf4j/slf4j-simple "1.7.25"]
                  [org.clojure/data.json "0.2.6"]
-                 [clj-http "3.9.1"]]
+                 [clj-http "3.9.1"]
+                 [com.taoensso/carmine "2.19.0"]]
   :plugins [[lein-auto "0.1.3"]]
   :main conductor.lk
   :deploy-repositories [["releases" :clojars]])

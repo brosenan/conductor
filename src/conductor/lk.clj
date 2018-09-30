@@ -52,9 +52,10 @@
   (-> cont
       (lk/add-env {:CONDUCTOR_API_URL (conductor-base-url server)})))
 
-(defn clj-worker-deployment [server name labels deps code & {:keys [num-pods num-threads]
+(defn clj-worker-deployment [server name labels deps code & {:keys [num-pods num-threads constants]
                                                              :or {num-pods 1
-                                                                  num-threads 2}}]
+                                                                  num-threads 2
+                                                                  constants {}}}]
   (let [workers (vec (for [[defworker worker] code
                            :when (= defworker 'defworker)]
                        `(var ~worker)))
@@ -63,10 +64,13 @@
                  (cons 'defn args)
                  ;; else
                  (cons defworker args)))
-        code (concat code [`(conduct/run-workers ~workers ~num-threads)])]
+        code (concat code `[(require 'conductor.core)
+                            (conductor.core/define-tasks ~workers)
+                            (conductor.core/run-workers ~workers ~num-threads)])]
     (-> (lk/pod name labels)
-        (lku/add-clj-container name deps {} code)
+        (lku/add-clj-container name deps constants code)
         (lk/update-container name add-client-envs server)
+        (lku/wait-for-service-port server :api)
         (lk/deployment num-pods))))
 
 (defn -main []
