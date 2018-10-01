@@ -4,7 +4,7 @@
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.9.0"]
-                 [brosenan/lambdakube "0.8.4"]
+                 [brosenan/lambdakube "0.9.2"]
                  [com.netflix.conductor/conductor-client "1.12.4-rc2"
                   :exclusions [com.google.guava/guava]]
                  [org.slf4j/slf4j-simple "1.7.25"]

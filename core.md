@@ -98,7 +98,7 @@ that in future releases.
 ```clojure
 (def worker-deps '[[org.clojure/clojure "1.9.0"]
                    [com.taoensso/carmine "2.19.0"]
-                   [brosenan/conductor "0.1.0"]])
+                   [brosenan/conductor "0.2.0"]])
 
 (worker-expr
  '(ns main
@@ -183,7 +183,7 @@ to check the final result on Redis.
 ```clojure
 (def test-deps '[[org.clojure/clojure "1.9.0"]
                  [com.taoensso/carmine "2.19.0"]
-                 [brosenan/conductor "0.1.0"]])
+                 [brosenan/conductor "0.2.0"]])
 
 (test-expr
  '(ns main-test
@@ -304,12 +304,13 @@ server.
 
 (deftest integ-test
   (testing "Putting it all together"
-    (let [$ (-> (lk/injector)
-                (test-module-part-1)
-                (test-module-part-2)
-                (test-module-part-3)
-                (conduct-lk/module)
-                (lk/standard-descs))]
-      (is (= (lkt/kube-tests $ "conductor") "")))))
+    (lku/with-docker-repo
+      (let [$ (-> (lk/injector)
+                  (test-module-part-1)
+                  (test-module-part-2)
+                  (test-module-part-3)
+                  (conduct-lk/module)
+                  (lk/standard-descs))]
+        (is (= (lkt/kube-tests $ "conductor") ""))))))
 ```
 
