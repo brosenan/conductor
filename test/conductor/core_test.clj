@@ -37,14 +37,16 @@
                      (lk/deployment 1)
                      (lk/expose-cluster-ip :redis (lk/port :redis :redis 6379 6379)))))))
 
-;; The workflow we use consists of five _stages_, consisting of ten
-;; tasks running in parallel in each of them. Each task updates a
-;; different key in the database, appending the stage number to its
-;; original value. For example, task 1 in stage 0 will append the
-;; digit 0 to the key `t1`. Task 7 on stage 3 will append the digit 3
-;; to the key `t7`, etc. Eventually, we want to see that all keys hold
-;; the value `01234`, indicating that the tasks were executed at the
-;; correct order.
+;; The workflow we use consists of six _stages_, consisting of ten
+;; tasks running in parallel in each of them. In the first stage, we
+;; assign empty strings to ten keys, marked `t0` through `t9`. On the
+;; following five stages, each task updates its respective key in the
+;; database, appending the stage number to its original value. For
+;; example, task 1 in stage 0 will append the digit 0 to the key
+;; `t1`. Task 7 on stage 3 will append the digit 3 to the key `t7`,
+;; etc. Eventually, we want to see that all keys hold the value
+;; `01234`, indicating that the tasks were executed at the correct
+;; order.
 
 ;; ![A screenshot of the Conductor UI displaying progress on the workflow in this example](conductor-ui-graph.png)
 
@@ -58,8 +60,9 @@
 ;; the workflow and checking the results, and of-course the above
 ;; Redis database.
 
-;; The worker deployment and the test pod are what lambda-kube refers
-;; to as [Clojure
+;; The other part consists of the Clojure code that goes into the
+;; worker deployment and the test pod. These are what lambda-kube
+;; refers to as [Clojure
 ;; nanoservices](https://github.com/brosenan/lambda-kube/blob/master/util.md#clojure-nanoservices),
 ;; that is, their Clojure code is embedded (as s-expressions) in their
 ;; definitions. For didactic reasons, we build this code outside the
